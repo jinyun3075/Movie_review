@@ -34,3 +34,20 @@ function showUploadedImages(arr){
         divArea.append("<img src='/display?fileName="+arr[i].imageURL+"'>");
     }
 }
+
+$(".uploadResult").on("click", ".removeBtn", function(e){
+
+    var target = $(this);
+    var fileName = target.data("name");
+    var targetDiv = target.closest("div");
+    console.log(targetDiv);
+
+    console.log(fileName);
+
+    $.post('/removeFile', {fileName:fileName}, function(result)){
+        console.log(result);
+        if(result==true){
+        targetDiv.remove();
+       }
+    }
+});
