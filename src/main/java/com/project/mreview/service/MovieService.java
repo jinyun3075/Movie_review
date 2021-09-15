@@ -4,6 +4,9 @@ import com.project.mreview.entity.movie.Movie;
 import com.project.mreview.entity.movieimage.MovieImage;
 import com.project.mreview.web.dto.MovieDto;
 import com.project.mreview.web.dto.MovieImageDto;
+import com.project.mreview.web.dto.PageRequestDto;
+import com.project.mreview.web.dto.PageResultDto;
+import org.springframework.data.domain.PageRequest;
 
 import java.util.HashMap;
 import java.util.List;
@@ -40,5 +43,31 @@ public interface MovieService {
         }
         return entityMap;
 
+    }
+
+    PageResultDto<MovieDto,Object[]> getList(PageRequestDto requestDto);
+    default MovieDto entitiesToDto(Movie movie, List<MovieImage> movieImages
+    ,double avg, Long reviewCnt){
+        MovieDto movieDto = MovieDto.builder()
+                .mno(movie.getMno())
+                .title(movie.getTitle())
+                .regDate(movie.getRegDate())
+                .modDate(movie.getModDate())
+                .build();
+
+        List<MovieImageDto> movieImageDtoList = movieImages.stream()
+                .map(i->{
+                    return MovieImageDto.builder()
+                            .imgName(i.getImgName())
+                            .path(i.getPath())
+                            .uuid(i.getUuid())
+                            .build();
+                }).collect(Collectors.toList());
+
+        movieDto.setImageDtoList(movieImageDtoList);
+        movieDto.setAvg(avg);
+        movieDto.setReviewCnt(reviewCnt.intValue());
+
+        return movieDto;
     }
 }

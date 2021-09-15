@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<th:block th:replace="~{/layout/basic :: setContent(~{this::content})}">
+    <th:block th:fragment="content">
+        <h1 class="mt-4">Movie List Page
+            <span>
+                <a th:href="@{/movie/register}">
+                    <button type="button" class="btn btn-outline-primary">저장</button>
+                </a>
+            </span>
+        </h1>
+
+        <from action="/movie/list" method="get" id="searchForm">
+            <input type="hidden" name="page" value="1">
+        </from>
+
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Title & picture</th>
+                <th scope="col">Review Count</th>
+                <th scope="col">AVG Rating</th>
+                <th scope="col">Regdate</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="dto:${result.dtoList}">
+                <th scope="row">
+                    <a th:href="@{/movie/read(mno=${dto.mno},page=${result.page})}">
+                        [[${dto.mno}]]
+                    </a>
+                </th>
+                <td><img th:if="${dto.imageDtoList.size() > 0 && dto.imageDtoList[0].path != null}"
+                         th:src="|/display?fileName=${dto.imageDtoList[0].getThumbnailURL()}|" >
+                    [[${dto.title}]]
+                </td>
+                <td><b>[[${dto.reviewCnt}]]</b></td>
+                <td><b>[[${dto.avg}]]</b></td>
+                <td>[[${#temporals.format(dto.regDate,'yyyy/MM//dd')}]]</td>
+            </tr>
+            </tbody>
+        </table>
+        <ul class="pagination h-100 justify-content-center align-item-center">
+            <li class="page-item" th:if="${result.prev}">
+                <a class="page-link" th:href="@{/movie/list(page=${result.start-1})}" tabindex="-1">Prev</a>
+            </li>
+            <li th:class="'page-item ' + ${result.page == page?'active':''}"
+                th:each="page:${result.pageList}">
+                <a class="page-link" th:href="@{/movie/list(page=${page})}">
+                    [[${page}]]
+                </a>
+            </li>
+            <li class="page-item" th:if="${result.next}">
+                <a class="page-link" th:href="@{/movie/list(page=${result.end+1})}">Next</a>
+            </li>
+        </ul>
+        <div class="modal" tabindex="-1" role="dialog">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Modal title</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Modal body text goes here.</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary">Save changes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script th:inline="javascript">
+            var msg = [[${msg}]];
+              console.log(msg);
+              if(msg){
+                $(".modal").modal();
+              }
+        </script>
+    </th:block>
+</th:block>

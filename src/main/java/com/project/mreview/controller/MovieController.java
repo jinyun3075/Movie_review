@@ -2,9 +2,11 @@ package com.project.mreview.controller;
 
 import com.project.mreview.service.MovieService;
 import com.project.mreview.web.dto.MovieDto;
+import com.project.mreview.web.dto.PageRequestDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,5 +30,11 @@ public class MovieController {
         redirectAttributes.addFlashAttribute("msg",mno);
 
         return "redirect:/movie/list";
+    }
+
+    @GetMapping("/list")
+    public void list(PageRequestDto pageRequestDto, Model model){
+        log.info("pageRequestDto:"+pageRequestDto);
+        model.addAttribute("result",movieService.getList(pageRequestDto));
     }
 }
