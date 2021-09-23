@@ -16,6 +16,8 @@ import java.util.stream.Collectors;
 public interface MovieService {
     Long register(MovieDto movieDto);
 
+    MovieDto getMovie(Long mno);
+
     default Map<String,Object> dtoToEntity(MovieDto movieDto){
         Map<String,Object> entityMap = new HashMap<>();
 
