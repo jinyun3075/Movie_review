@@ -161,3 +161,95 @@ $('.btn-primary').on("click", function(e){
 
 
 })
+//-----------------------------------------------------------------------------
+
+var grade = 0;
+var mno = [[${dto.mno}]];
+$(document).ready(function(e){
+    $('.starrr').starrr({
+        rating: grade,
+        change: function(e,value){
+            if(value){
+                console.log(value);
+                grade=value;
+            }
+        }
+    });
+});
+
+var reviewModal = $(".reviewModal");
+var inputMid = $('input[name="mid"]');
+var inputText = $('input[name="text"]');
+
+$(".addReviewBtn").click(function(){
+    inputMid.val("");
+    inputText.val("");
+
+    $(".removeBtn, .modifyBtn").hide();
+    $(".saveBtn").show();
+
+    reviewModal.modal('show');
+});
+
+$('.saveBtn').click(function(){
+    var data = {mno:mno, grade:grade, text:inputText.val(), mid:inputMid.val() };
+    console.log(data);
+
+    $.ajax({
+        url: '/reviews/'+mno,
+        type: "POST",
+        data: JSON.stringify(data),
+        contentType:"application/json; charset=utf-8",
+        dataType:"text",
+        success: function(result){
+            console.log("result:"+result);
+            self.location.reload();
+        }
+    })
+    reviewModal.modal('hide');
+});
+
+function getMovieReviews(){
+    function formatTime(str){
+        var date = new Date(str);
+
+        return date.getFullYear()+'/'+
+        (date.getMonth()+1)+'/'+
+        date.getDate()+' '+
+        date.getHours()+':'+
+        date.getMinutes();
+    }
+    $.getJSON("/reviews/"+mno+"/all",function(arr){
+        var str="";
+
+        $.each(arr,function(idx,review){
+            console.log(review);
+            str+='<div class="card-body" data-reviewnum='+review.reviewnum+' data-mid='+review.mid+'>';
+            str+='<h5 class="card-title">'+review.text+' <span>'+review.grade+'</span></h5>';
+            str+='<h6 class="card-subtitle mb-2 text-muted">'+review.nickname+'</h6>';
+            str+='<p class="card-text">'+formatTime(review.regDate)+'</p>';
+            str+='</div>';
+        });
+        $(".reviewList").html(str);
+    });
+}
+getMovieReviews();
+
+//댓글 리스트 불러오기
+var reviewnum;
+$(".reviewList").on("click",".card-body", function(){
+    $(".saveBtn").hide();
+    $(".removeBtn",".modifyBtn").show();
+
+    var targetReview=$(this);
+
+    reviewnum = targetReview.data("reviewnum");
+
+    console.log("reviewnum: "+reviewnum);
+    inputMid.val(targetReview.data("mid"));
+    inputText.val(targetReview.find('.card-title').clone().children().remove().end().text());
+
+    var grade = targetReview.find('.card-title span').html();
+    $(".starrr a:nth-child("+grade+")").trigger('click');
+    $('.reviewModal').modal('show');
+})
